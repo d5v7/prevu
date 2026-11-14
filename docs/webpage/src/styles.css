@@ -531,13 +531,18 @@ h1 {
   margin-top: 20px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+  align-items: stretch;
 }
 
 .downloadItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   border: 1px solid var(--line);
   background: var(--surface-raised);
-  padding: 16px;
+  padding: 18px;
+  height: 100%;
 }
 
 .osHead {
@@ -643,6 +648,163 @@ button.assetBtn:disabled {
   border-color: var(--ink);
 }
 
+.terminalBlock {
+  margin: 16px 0 12px;
+  border: 1px solid #2a2f3a;
+  background: #12141a;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(18, 20, 26, 0.12);
+}
+
+.terminalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #1a1d24;
+  border-bottom: 1px solid #282d38;
+}
+
+.terminalDots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.terminalDots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.terminalDots .dotClose {
+  background: #ff5f56;
+  box-shadow: 0 0 0 1px #e0443e;
+}
+
+.terminalDots .dotMin {
+  background: #ffbd2e;
+  box-shadow: 0 0 0 1px #dea123;
+}
+
+.terminalDots .dotMax {
+  background: #27c93f;
+  box-shadow: 0 0 0 1px #1aab29;
+}
+
+.terminalTitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #8c93a4;
+  text-transform: uppercase;
+  flex: 1 1 auto;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.copyBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 1px solid #2e3442;
+  background: #12141a;
+  color: #b4bac8;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.copyBtn:hover {
+  background: #252a36;
+  color: #ffffff;
+  border-color: #434c5e;
+}
+
+.copyBtn:focus-visible {
+  outline: 2px solid var(--accent, #0f766e);
+  outline-offset: 1px;
+}
+
+.copyBtn.copied {
+  background: #0f4035;
+  color: #4ade80;
+  border-color: #10b981;
+}
+
+.copyLabel {
+  font-size: 11px;
+}
+
+.copyTooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  right: 0;
+  padding: 4px 8px;
+  background: #0b0c10;
+  color: #f0f2f5;
+  border: 1px solid #303746;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.copyTooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: #0b0c10 transparent transparent transparent;
+}
+
+.copyBtn:hover .copyTooltip,
+.copyTooltip.activeTooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.terminalCode {
+  margin: 0;
+  padding: 14px 16px;
+  background: #12141a;
+  color: #e8eaee;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.terminalCode code {
+  font-family: inherit;
+  color: inherit;
+  display: block;
+}
+
+.guideBlock .terminalBlock {
+  margin: 8px 0 12px;
+}
+
 .devSnippet {
   margin: 16px 0 0;
   padding: 14px 16px;
@@ -706,11 +868,70 @@ button.assetBtn:disabled {
   max-width: none;
 }
 
-.guideGrid {
+.guideStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 16px;
+}
+
+.guideRow {
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  padding: 18px 20px;
+}
+
+.guideRowHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.guideRowHead h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.guideRowHead p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.guideRow ol,
+.guideRow ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.guideRow li + li {
+  margin-top: 6px;
+}
+
+.linuxDistroGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.distroCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.distroCol .guideNote {
+  margin: 0 0 6px;
+}
+
+.distroCol .terminalBlock {
+  margin: 0;
+  flex: 1 1 auto;
 }
 
 .guideBlock {
@@ -830,7 +1051,8 @@ button.assetBtn:disabled {
 
   .downloadGrid,
   .guideGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .shotGrid {
@@ -839,6 +1061,13 @@ button.assetBtn:disabled {
 
   .lightboxStage {
     padding: 12px 48px;
+  }
+}
+
+@media (max-width: 860px) {
+  .linuxDistroGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
@@ -903,7 +1132,9 @@ button.assetBtn:disabled {
   }
 
   .featureGrid,
-  .docGrid {
+  .docGrid,
+  .downloadGrid,
+  .guideGrid {
     grid-template-columns: 1fr;
   }
 
@@ -915,5 +1146,19 @@ button.assetBtn:disabled {
 
   .siteFooter {
     flex-direction: column;
+  }
+
+  .terminalHeader {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .terminalTitle {
+    font-size: 10px;
+  }
+
+  .terminalCode {
+    padding: 12px 14px;
+    font-size: 12px;
   }
 }

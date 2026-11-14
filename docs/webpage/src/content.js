@@ -89,17 +89,17 @@ export const platforms = [
     exts: [".exe", ".msi"],
   },
   {
-    id: "macos",
-    name: "macOS",
-    detail: "DMG / app bundles — Apple Silicon + Intel",
-    exts: [".dmg"],
-  },
-  {
     id: "linux",
     name: "Linux",
     detail: "AppImage, .deb, and Arch AUR (prevu)",
     exts: [".appimage", ".deb"],
     note: "yay -S prevu",
+  },
+  {
+    id: "macos",
+    name: "macOS",
+    detail: "DMG / app bundles — Apple Silicon + Intel",
+    exts: [".dmg"],
   },
 ];
 
