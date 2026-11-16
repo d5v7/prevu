@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaApple,
+  FaCheck,
   FaChevronLeft,
   FaChevronRight,
+  FaCopy,
   FaGithub,
   FaLinux,
   FaTimes,
@@ -185,6 +187,60 @@ function ScreenshotLightbox({ index, onClose, onPrev, onNext }) {
           <span>Use ← → or the arrows · Esc to close</span>
         </p>
       </div>
+    </div>
+  );
+}
+
+function CodeBlock({ code, title = "bash", className = "" }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = code;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  };
+
+  return (
+    <div className={`terminalBlock ${className}`.trim()}>
+      <div className="terminalHeader">
+        <div className="terminalDots" aria-hidden="true">
+          <span className="dot dotClose" />
+          <span className="dot dotMin" />
+          <span className="dot dotMax" />
+        </div>
+        <span className="terminalTitle">{title}</span>
+        <button
+          type="button"
+          className={`copyBtn ${copied ? "copied" : ""}`}
+          onClick={handleCopy}
+          aria-label={copied ? "Copied code" : `Copy ${title} code to clipboard`}
+          title={copied ? "Copied!" : "Copy code"}
+        >
+          {copied ? <FaCheck aria-hidden="true" /> : <FaCopy aria-hidden="true" />}
+          <span className="copyLabel">{copied ? "Copied!" : "Copy"}</span>
+          <span className={`copyTooltip ${copied ? "activeTooltip" : ""}`} role="status" aria-live="polite">
+            {copied ? "Copied!" : "Copy to clipboard"}
+          </span>
+        </button>
+      </div>
+      <pre className="terminalCode">
+        <code>{code}</code>
+      </pre>
     </div>
   );
 }
@@ -404,11 +460,12 @@ function HomePage({ releaseTag, releaseLoading, findByExt, version, navigate }) 
             </a>
           ))}
         </div>
-        <pre className="devSnippet">
-          <code>{`bun install
+        <CodeBlock
+          title="Terminal — Quickstart"
+          code={`bun install
 bun run tauri:dev
-bun run cli -- inspect http://localhost:3000`}</code>
-        </pre>
+bun run cli -- inspect http://localhost:3000`}
+        />
         <p className="sectionText">
           Full contributor workflow:{" "}
           <a href={CONTRIBUTING} target="_blank" rel="noreferrer">
@@ -462,20 +519,34 @@ function GuidePage({ navigate }) {
             <strong>Windows EXE</strong> for typical installs; <strong>MSI</strong> for managed deployments.
           </li>
           <li>
-            <strong>macOS DMG</strong> for drag-and-drop into Applications.
-          </li>
-          <li>
             <strong>Linux AppImage</strong> for portable runs; <strong>.deb</strong> for Debian/Ubuntu; AUR package{" "}
             <code>prevu</code> on Arch.
+          </li>
+          <li>
+            <strong>macOS DMG</strong> for drag-and-drop into Applications.
           </li>
         </ul>
       </article>
 
-      <div className="guideGrid">
-        <article className="guideBlock">
-          <h2>Windows</h2>
+      <div className="guideStack">
+        <article className="guideRow">
+          <div className="guideRowHead">
+            <span className="osIcon" aria-hidden="true">
+              <FaWindows />
+            </span>
+            <div>
+              <h2>Windows</h2>
+              <p>NSIS (.exe) and MSI installers</p>
+            </div>
+          </div>
           <ol>
-            <li>Download the EXE (or MSI) from Releases.</li>
+            <li>
+              Download <code>PREVU_*_x64-setup.exe</code> (or the <code>.msi</code>) from{" "}
+              <a href={RELEASES} target="_blank" rel="noreferrer">
+                Releases
+              </a>
+              .
+            </li>
             <li>Run the installer.</li>
             <li>
               If SmartScreen appears: <strong>More info → Run anyway</strong>.
@@ -484,36 +555,68 @@ function GuidePage({ navigate }) {
           </ol>
         </article>
 
-        <article className="guideBlock">
-          <h2>macOS</h2>
-          <ol>
-            <li>Download the DMG for your architecture.</li>
-            <li>Drag PREVU into Applications.</li>
-            <li>
-              If blocked, use <strong>Privacy &amp; Security → Open Anyway</strong>, or:
-            </li>
-          </ol>
-          <pre>
-            <code>xattr -cr /Applications/PREVU.app</code>
-          </pre>
+        <article className="guideRow">
+          <div className="guideRowHead">
+            <span className="osIcon" aria-hidden="true">
+              <FaLinux />
+            </span>
+            <div>
+              <h2>Linux</h2>
+              <p>AppImage, .deb, and Arch AUR (prevu)</p>
+            </div>
+          </div>
+          <div className="linuxDistroGrid">
+            <div className="distroCol">
+              <p className="guideNote">Arch (AUR)</p>
+              <CodeBlock title="Arch Linux (AUR)" code="yay -S prevu" />
+            </div>
+            <div className="distroCol">
+              <p className="guideNote">AppImage</p>
+              <CodeBlock
+                title="Linux AppImage"
+                code={`chmod +x PREVU_*_amd64.AppImage
+./PREVU_*_amd64.AppImage`}
+              />
+            </div>
+            <div className="distroCol">
+              <p className="guideNote">Debian / Ubuntu</p>
+              <CodeBlock
+                title="Debian / Ubuntu"
+                code={`sudo dpkg -i PREVU_*_amd64.deb
+sudo apt-get install -f`}
+              />
+            </div>
+          </div>
         </article>
 
-        <article className="guideBlock">
-          <h2>Linux</h2>
-          <p className="guideNote">Arch (AUR)</p>
-          <pre>
-            <code>yay -S prevu</code>
-          </pre>
-          <p className="guideNote">AppImage</p>
-          <pre>
-            <code>{`chmod +x PREVU_*_amd64.AppImage
-./PREVU_*_amd64.AppImage`}</code>
-          </pre>
-          <p className="guideNote">Debian / Ubuntu</p>
-          <pre>
-            <code>{`sudo dpkg -i PREVU_*_amd64.deb
-sudo apt-get install -f`}</code>
-          </pre>
+        <article className="guideRow">
+          <div className="guideRowHead">
+            <span className="osIcon" aria-hidden="true">
+              <FaApple />
+            </span>
+            <div>
+              <h2>macOS</h2>
+              <p>DMG / app bundles — Apple Silicon + Intel</p>
+            </div>
+          </div>
+          <ol>
+            <li>
+              Download the <code>.dmg</code> for your architecture from{" "}
+              <a href={RELEASES} target="_blank" rel="noreferrer">
+                Releases
+              </a>
+              .
+            </li>
+            <li>Open it, drag <strong>PREVU</strong> into <strong>Applications</strong>, then eject.</li>
+            <li>
+              If macOS reports the app is damaged or blocked, use{" "}
+              <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>, or run:
+            </li>
+          </ol>
+          <CodeBlock
+            title="macOS Terminal"
+            code="xattr -cr /Applications/PREVU.app"
+          />
         </article>
       </div>
 
